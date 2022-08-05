@@ -26,24 +26,20 @@ function extractInfo() {
 
       if (TARGET_FILES.includes(filePath)) {
         const formatLine = (csv: string, cb: (e: Error, data: any) => void) => {
-          parse(
-            csv.toString(),
-            {
-              columns: header => header.map(camelcase),
-            },
-            (error, records) => {
-              const key = camelcase(filePath.split('.')[0]);
+          parse.parse(csv.toString(), {
+            columns: header => header.map(camelcase),
+          }, (error, records) => {
+            const key = camelcase(filePath.split('.')[0]);
 
-              if (error) {
-                console.error(`error while reading file ${key}:`, error);
-                entry.destroy(error);
-              } else {
-                result[key] = key === 'profile' ? records[0] : records;
-              }
+            if (error) {
+              console.error(`error while reading file ${key}:`, error);
+              entry.destroy(error);
+            } else {
+              result[key] = key === 'profile' ? records[0] : records;
+            }
 
-              cb(null, null);
-            },
-          );
+            cb(null, null);
+          });
         };
 
         entry.pipe(es.map(formatLine)).on('close', cb);
